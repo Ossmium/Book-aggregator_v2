@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %} Login {% endblock %}
+{% block content %}
+<div class="d-flex flex-column justify-content-center ms-auto me-auto login_window rounded-3" style="max-width: 20rem; margin-top: 7rem;">
+    <h2>Вход</h2>
+    <form method="post" class="form">
+        {{ form.username }}
+        {{ form.password }}
+        <div class="mb-1 mt-2">Запомнить меня: {{ form.remember_me }}</div>
+        {% csrf_token %}
+        <input type="submit" class="btn btn-primary btn-std w-100 mb-2" value="Войти">
+    </form>
+    <a href="{% url 'accounts:signup' %}" class="btn btn-outline-primary btn-sm w-100 mb-2">Зарегистрироваться</a>
+   <a href="{% url 'password_reset' %}" class="btn btn-outline-primary btn-sm w-100">Восстановить пароль</a>
+</div>
+{% endblock %}

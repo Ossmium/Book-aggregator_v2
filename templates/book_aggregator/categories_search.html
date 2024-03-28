@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Aggregator{% endblock %}
+{% block content %}
+<form method="get" class="row g-2 ms-5 me-5">
+    <p class="mt-3 mb-1">Результаты поиска по категории «{{ category }}» {{ books|length }}</p>
+    <div class="d-flex flex-column col-sm-3">
+        <p class="align-items-start mb-1">Авторы</p>
+        <ul class="list-group authors_list">
+            <li>{{ filter_form.authors }}</li>
+        </ul>
+        <p class="align-items-start mt-2 mb-1">Жанры</p>
+        <ul class="list-group authors_list">
+            <li>{{ filter_form.genre }}</li>
+        </ul>
+        <div class="form-check form-switch mt-2">
+            {{ filter_form.more_than_four }}
+            <label class="form-check-label" for="id_more_than_four">Рейтинг книги более 4</label>
+        </div>
+        <div class="form-check form-switch mt-2">
+            {{ filter_form.have_electronic }}
+            <label class="form-check-label" for="id_more_than_four">Есть электронная версия</label>
+        </div>
+        <div class="form-check form-switch mt-2">
+            {{ filter_form.have_physical }}
+            <label class="form-check-label" for="id_more_than_four">Есть физическая версия</label>
+        </div>
+        <div class="d-flex justify-content-center">
+            <input class="w-75 mt-3 btn btn-outline-primary" type="submit" value="Показать">
+        </div>
+    </div>
+    <div class="col-sm d-flex flex-column ms-2">
+        <div class="mb-2">
+            <form method="get">
+                {{ sort_form.sort }}
+            </form>
+        </div>
+        <div class="d-flex flex-column">
+            {% for book in books %}
+            <div class="card mb-3" style="max-width: auto;">
+                <div class="row g-0">
+                    <div class="col-md-2">
+                        <img src="{{ book.image_url }}" class="img-fluid rounded-start">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body">
+                            <a href='{{ book.get_absolute_url }}' style="text-decoration: none; color: black;"><h5 class="card-title">{{ book.name }}</h5></a>
+                            <h6>{{ book.author }}</h6>
+                            <div class="d-column">
+                                <div class="d-flex align-items-center">
+                                    {% if book.avg_rating > 0 %}
+                                        <svg width="16" height="16" fill="#ffc72c" class="me-2">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.486 13.376a1 1 0 00-.973 0l-2.697 1.502a1 1 0 01-1.474-1.033l.543-3.35a1 1 0 00-.27-.855L1.277 7.225a1 1 0 01.566-1.684l3.136-.483a1 1 0 00.754-.566l1.361-2.921a1 1 0 011.813 0l1.362 2.921a1 1 0 00.754.566l3.136.483a1 1 0 01.566 1.684l-2.34 2.415a1 1 0 00-.269.856l.542 3.349a1 1 0 01-1.473 1.033l-2.698-1.502z"></path>
+                                        </svg>
+                                        {{ book.avg_rating|floatformat:-1 }}
+                                    {% else %}
+                                        Нет оценок
+                                    {% endif %}
+                                </div>
+                                <div>от {{ book.min_price }}</div>
+                            </div>
+                            <p class="card-text">{{ book.description|truncatechars:400 }}</p>
+                            <p class="card-text"><small class="text-muted">Последнее обновление: {{ book.updated_at }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% comment %} {% include "pagination.html" with page=books %} {% endcomment %}
+    {% comment %} {{ params }} {% endcomment %}
+</form>
+{% endblock %}

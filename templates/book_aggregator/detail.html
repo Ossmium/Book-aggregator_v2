@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}{{ book.name }}{% endblock %}
+{% block content %}
+
+<div class="row g-3">
+    <div class="col-sm-3">
+        <img src="{{ book.image_url }}" class="img-fluid rounded w-100" style="max-height: 450px;">
+        <form class="mt-3 d-flex justify-content-center" method="post">
+            {% csrf_token %}
+            {% if user.is_authenticated %}
+                <button class="btn btn-outline-primary w-100" type="submit" value="add_to_favourite">
+                    {% if added_to_favourite %}
+                        Убрать из избранного
+                    {% else %}
+                        Добавить в избранное
+                    {% endif %}
+                </button>
+            {% else %}
+            <a href="{% url "login" %}" class="btn btn-outline-primary w-100" type="submit" value="add_to_favourite">
+                {% if added_to_favourite %}
+                    Убрать из избранного
+                {% else %}
+                    Добавить в избранное
+                {% endif %}
+            </a>
+            {% endif %}
+        </form>
+        <a href="{% url "book_aggregator:comment" book.slug %}">
+            {% if user.is_authenticated %}
+                <button class="btn btn-outline-primary w-100 mt-2" value="have_comment">
+                    {% if have_comment %}
+                        Изменить отзыв
+                    {% else %}
+                        Добавить отзыв
+                    {% endif %}
+                </button>
+            {% else %}
+                <a href="{% url "login" %}" class="btn btn-outline-primary w-100 mt-2" value="have_comment">
+                    {% if have_comment %}
+                        Изменить отзыв
+                    {% else %}
+                        Добавить отзыв
+                    {% endif %}
+                </a>
+            {% endif %}
+        </a>
+    </div>
+    <div class="col ms-4">
+        <div class="mb-2">
+            <p class="fw-bold mb-0">
+                {% if book.min_price != book.max_price %}
+                    от {{ book.min_price }} ₽ до {{ book.max_price }} ₽
+                {% else %}
+                    {{ book.min_price }} ₽
+                {% endif %}
+            </p>
+        </div>
+        <div class="d-flex align-items-center mb-2 fw-normal">
+            <p class="mb-0 me-2 p-0">Средняя оценка на ресурсах:</p>
+            {% if book.avg_rating > 0 %}
+                <div class="d-flex align-items-center m-0 p-0">
+                    <svg width="16" height="16" fill="#ffc72c" class="me-2">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.486 13.376a1 1 0 00-.973 0l-2.697 1.502a1 1 0 01-1.474-1.033l.543-3.35a1 1 0 00-.27-.855L1.277 7.225a1 1 0 01.566-1.684l3.136-.483a1 1 0 00.754-.566l1.361-2.921a1 1 0 011.813 0l1.362 2.921a1 1 0 00.754.566l3.136.483a1 1 0 01.566 1.684l-2.34 2.415a1 1 0 00-.269.856l.542 3.349a1 1 0 01-1.473 1.033l-2.698-1.502z"></path>
+                    </svg>
+                    <div>{{ book.avg_rating|floatformat:-1 }}</div>
+                </div>
+            {% else %}
+                Нет оценок
+            {% endif %}
+        </div>
+        <div class="d-flex align-items-center mb-3 fw-normal">
+            <p class="mb-0 me-2 p-0">Средняя оценка:</p>
+            {% if avg_rating > 0 %}
+                <div class="d-flex align-items-center m-0 p-0">
+                    <svg width="16" height="16" fill="#ffc72c" class="me-2">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.486 13.376a1 1 0 00-.973 0l-2.697 1.502a1 1 0 01-1.474-1.033l.543-3.35a1 1 0 00-.27-.855L1.277 7.225a1 1 0 01.566-1.684l3.136-.483a1 1 0 00.754-.566l1.361-2.921a1 1 0 011.813 0l1.362 2.921a1 1 0 00.754.566l3.136.483a1 1 0 01.566 1.684l-2.34 2.415a1 1 0 00-.269.856l.542 3.349a1 1 0 01-1.473 1.033l-2.698-1.502z"></path>
+                    </svg>
+                    <div>{{ avg_rating|floatformat:-1 }}</div>
+                </div>
+            {% else %}
+                Нет оценок
+            {% endif %}
+        </div>
+        <h3 class="mb-4">{{ book.name }}</h3>
+        <div>
+            <h4 class="mb-3">Описание</h4>
+            <p>{{ book.description }}<p>
+        </div>
+        <p class="text-muted">
+            Последнее обновление: {{ book.updated_at }}
+        </p>
+        <div class="mb-3">
+            {% for genre in genres %}
+                <a href="{{ genre.get_absolute_url }}" class="badge rounded-pill bg-primary genre">{{ genre }}</a>
+            {% endfor %}
+        </div>
+        <div>
+            {% if comments|length %}
+                <div>
+                    <div class="d-flex flex-direction-row align-items-center">
+                        <h4 class="mb-3 me-2">Отзывы</h4>
+                        <div class="text-muted">
+                            {% with comments|length as total_comments %}
+                                <h5 class="mb-3">{{ total_comments }}</h5>
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div>
+                        {% for comment in comments %}
+                            <div class="card text-dark bg-light mb-3">
+                                <div class="card-body">
+                                    <div class="card-title d-flex flex-direction-row justify-content-between mb-1 p-0">
+                                        <div class="d-flex flex-direction-row">
+                                            <p class="me-2">{{ comment.3.name }}</p>
+                                            <p>{{ comment.3.created }}</p>
+                                        </div>
+                                        <div>
+                                            {% if comment.1 %}
+                                                {% for active_star in comment.1 %}
+                                                    <svg width="22px" height="21px" viewBox="0 0 22 21" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                            <path d="M11,17.1483333 L16.1810004,20.2753773 C16.6538365,20.5607621 17.268496,20.4088029 17.5538808,19.9359669 C17.6885693,19.7128101 17.7308035,19.4458833 17.6715868,19.1920461 L16.2966667,13.2983333 L20.8752723,9.3318856 C21.2927035,8.9702648 21.3379468,8.3387183 20.9763259,7.9212871 C20.8056446,7.7242638 20.5647759,7.6016755 20.3050362,7.5796391 L14.2783333,7.0683333 L11.9207179,1.50570331 C11.7052005,0.99720486 11.1182696,0.75969683 10.6097711,0.97521427 C10.3707977,1.07649865 10.1805665,1.26672985 10.0792821,1.50570331 L7.7216667,7.0683333 L1.69496379,7.5796391 C1.144656,7.6263273 0.73639162,8.1102881 0.78307976,8.6605959 C0.80511609,8.9203356 0.92770441,9.1612042 1.12472773,9.3318856 L5.70333333,13.2983333 L4.32841315,19.1920461 C4.20294189,19.7298893 4.53723546,20.267612 5.07507876,20.3930833 C5.32891596,20.4523 5.5958428,20.4100658 5.81899958,20.2753773 L11,17.1483333 Z" fill="#ffc72c">
+                                                            </path>
+                                                        </g>
+                                                    </svg>
+                                                {% endfor %}
+                                            {% endif %}
+                                            {% if comment.2 %}
+                                                {% for disable_star in comment.2 %}
+                                                    <svg width="22px" height="21px" viewBox="0 0 22 21" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                            <path d="M11,17.1483333 L16.1810004,20.2753773 C16.6538365,20.5607621 17.268496,20.4088029 17.5538808,19.9359669 C17.6885693,19.7128101 17.7308035,19.4458833 17.6715868,19.1920461 L16.2966667,13.2983333 L20.8752723,9.3318856 C21.2927035,8.9702648 21.3379468,8.3387183 20.9763259,7.9212871 C20.8056446,7.7242638 20.5647759,7.6016755 20.3050362,7.5796391 L14.2783333,7.0683333 L11.9207179,1.50570331 C11.7052005,0.99720486 11.1182696,0.75969683 10.6097711,0.97521427 C10.3707977,1.07649865 10.1805665,1.26672985 10.0792821,1.50570331 L7.7216667,7.0683333 L1.69496379,7.5796391 C1.144656,7.6263273 0.73639162,8.1102881 0.78307976,8.6605959 C0.80511609,8.9203356 0.92770441,9.1612042 1.12472773,9.3318856 L5.70333333,13.2983333 L4.32841315,19.1920461 C4.20294189,19.7298893 4.53723546,20.267612 5.07507876,20.3930833 C5.32891596,20.4523 5.5958428,20.4100658 5.81899958,20.2753773 L11,17.1483333 Z" fill="#d6d6d6">
+                                                            </path>
+                                                        </g>
+                                                    </svg>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <p class="card-text">{{ comment.3.body }}</p>
+                                    <p class="text-muted p-0 mt-4 mb-0" style="font-size: 14px;">Изменено: {{ comment.3.updated }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    </ul>
+                </div>
+            {% else %}
+                <h4 class="mb-3">Отзывов нет</h4>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-sm-3">
+        {% for source in sources %}
+            <div class="dropdown mb-2">
+                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ source.0 }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                    {% for el in source.1 %}
+                        <li><a class="dropdown-item" href="{{ el.url }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="me-3">{{ el.price }}</div>
+                                    <div class="d-flex align-items-center">
+                                        <svg width="16" height="16" fill="#ffc72c" class="me-2">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.486 13.376a1 1 0 00-.973 0l-2.697 1.502a1 1 0 01-1.474-1.033l.543-3.35a1 1 0 00-.27-.855L1.277 7.225a1 1 0 01.566-1.684l3.136-.483a1 1 0 00.754-.566l1.361-2.921a1 1 0 011.813 0l1.362 2.921a1 1 0 00.754.566l3.136.483a1 1 0 01.566 1.684l-2.34 2.415a1 1 0 00-.269.856l.542 3.349a1 1 0 01-1.473 1.033l-2.698-1.502z"></path>
+                                        </svg>
+                                        {{ el.rating }}
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
