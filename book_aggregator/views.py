@@ -15,31 +15,11 @@ from book_aggregator.forms import SearchForm, FilterForm, SortForm, CommentForm,
 
 def index(request):
     params = []
-    # form = SearchForm()
-    # filter_form = FilterForm()
-    # query = None
-    # results = []
-    #
-    # if 'query' in request.GET:
-    #     form = SearchForm(request.GET)
-    #     filter_form = FilterForm(request.GET)
-    #     # search_form = SearchForm()
-    #     if form.is_valid():
-    #         query = form.cleaned_data['query']
-    #         results = Book.objects.annotate(
-    #             similarity=TrigramSimilarity("name", query),
-    #         ).filter(similarity__gt=0.1).order_by('-similarity')
-    # with open("final_file_v4.json", 'r', encoding='utf-8') as file:
-    #     books = json.load(file)
-    # for i, book in enumerate(books):
-    #     add_book(book, i)
-    # books_list = Book.objects.filter(id=100)
-    # for book in books_list:
-    #     print(book.slug)
     books_list = Book.objects.all()
     books_subcategories = SubCategory.objects.all()
-    #
-    # print(books_list.filter(genres__contains=['Самореализация', 'Саморазвитие / личностный рост']), len(books_list.filter(genres__contains=['Самореализация', 'Саморазвитие / личностный рост'])))
+
+    if request.user.is_authenticated:
+        print(request.user.favourite_books.filter())
 
     return render(request, "book_aggregator/index.html", context={
         # 'form': form,
@@ -613,7 +593,7 @@ def book_detail(request, book_slug):
         'book': book,
         'genres': genres,
         'sources': book_sources_list,
-        'similar_books': sorted_similar_books[:5],
+        'similar_books': sorted_similar_books[:9],
         'added_to_favourite': added_to_favourite,
         'comments': comments_with_rating,
         'have_comment': have_comment,
@@ -686,4 +666,19 @@ def book_comment(request, book_slug):
         'form': form,
         'rating_form': rating_form,
         'have_comment': have_comment,
+    })
+
+
+def user_favourite_books(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('accounts:login'))
+
+    favourite_books = []
+    if request.user.is_authenticated:
+        favourite_books = request.user.favourite_books.filter()
+        commented_books = [comment.book for comment in Comment.objects.filter(
+            name=request.user.username)]
+        print(commented_books)
+    return render(request, 'book_aggregator/favourite_books.html', context={
+        'favourite_books': favourite_books,
     })

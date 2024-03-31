@@ -1,5 +1,10 @@
-<ul class="ms-5 d-flex flex-direction-row flex-wrap p-0">
-    {% for book in latest_books %}
+{% extends "base.html" %}
+{% load book_aggregator_tags %}
+{% block title %}Избранное{% endblock %}
+{% block content %}
+<h4>Избранное</h4>
+<ul class="ms-2 d-flex flex-direction-row flex-wrap p-0 mt-3">
+    {% for book in favourite_books %}
         <li style="list-style-type: none; margin-right: 1em;">
             <a href="{{ book.get_absolute_url }}" class="card" style="width: 10rem; text-decoration: none; color: black;  overflow: hidden; height: 260px;">
                 <img src="{{ book.image_url }}" class="card-img-top" style="max-height: 200px;">
@@ -8,5 +13,10 @@
                 </div>
             </a>
         </li>
+    {% empty %}
+        <div class="d-flex justify-content-center align-items-center m-auto" style="font-size: 2rem;">
+            Вы еще ничего не добавили
+        </div>
     {% endfor %}
 </ul>
+{% endblock %}

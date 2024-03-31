@@ -13,7 +13,7 @@
     <body>
     <nav class="d-flex flex-row align-items-center navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid" style="margin-left: 7rem; margin-right: 7rem; padding-left: 0; padding-right: 0;">
-        <a class="navbar-brand" href="/">BookShelf</a>
+        <a class="navbar-brand" href="/" style="font-size: 28px; font-weight: 500;">BookShelf</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -45,7 +45,7 @@
                     </svg>
                   </div> 
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="#">Избранное</a></li>
+                    <li><a class="dropdown-item" href="{% url "book_aggregator:favourite_books" %}">Избранное</a></li>
                     <li><a class="dropdown-item" href="#">Профиль</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
