@@ -49,7 +49,8 @@ class Book(models.Model):
     sources = models.JSONField()
     added_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField()
-    slug = models.SlugField(max_length=100, unique=True)
+    url = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=1000)
     users = models.ManyToManyField(User, related_name='favourite_books')
 
     class Meta:
@@ -60,7 +61,7 @@ class Book(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('book_aggregator:detail', args=[self.slug])
+        return reverse('book_aggregator:detail', args=[self.url])
 
 
 class Comment(models.Model):

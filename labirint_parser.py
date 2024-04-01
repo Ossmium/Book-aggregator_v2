@@ -33,7 +33,8 @@ def get_book_data(url):
     if not book_price:
         book_price = soup.find("span", class_="buying-price-val-number")
         if not book_price:
-            book_price = soup.find("span", class_="buying-priceold-val").getText()
+            book_price = soup.find(
+                "span", class_="buying-priceold-val").getText()
         else:
             book_price = book_price.text
     else:
@@ -47,45 +48,35 @@ def get_book_data(url):
     return book_dict
 
 
-def main():
+def parser_labirint():
     count_pages = 0
     count_books = 0
-    global FILENAME
-    for file in os.listdir("./response_custom_all_labirint")[11:]:
-        with open(f"./response_custom_all_labirint/{file}", 'r', encoding='utf-8') as f:
-            books_info_pages = json.load(f)
-        FILENAME = f"./response_custom_all_labirint/{file}"
-        # print(file)
-        try:
-            for books_info_page in books_info_pages:
-                for book_info in books_info_page:
-                    if "labirint" not in book_info.keys() or book_info["labirint"] == []:
-                        url = f"https://www.labirint.ru/search/{book_info['book_name']}/?stype=0"
-                        urls = get_urls(url, book_info["book_name_without_symbols"])
-                        try:
-                            with Pool(8) as p:
-                                result = p.map(get_book_data, urls)
-                        except KeyboardInterrupt:
-                            p.terminate()
-                            p.join()
-                            with open(FILENAME, 'w', encoding='utf-8') as f:
-                                json.dump(books_info_pages, f, indent=4, ensure_ascii=False)
-                        book_info["labirint"] = result
-                    count_books += 1
-                    if count_books % 25 == 0:
-                        print(f"[+] Обработано {count_books}")
-                count_pages += 1
-                with open(FILENAME, 'w', encoding='utf-8') as f:
-                    json.dump(books_info_pages, f, indent=4, ensure_ascii=False)
-            print(f"[+] Файл {file} обработан")
-        except:
-            print("Исключение")
-            with open(f"./response_custom_all_labirint/{file}", 'w', encoding='utf-8') as f:
-                json.dump(books_info_pages, f, indent=4, ensure_ascii=False)
-
-    with open(FILENAME, 'w', encoding='utf-8') as f:
-        json.dump(books_info_pages, f, indent=4, ensure_ascii=False)
-
-
-if __name__ == "__main__":
-    main()
+    with open(f"response_custom.json", 'r', encoding='utf-8') as f:
+        books = json.load(f)
+    try:
+        for book in books:
+            if "labirint" not in book.keys() or book["labirint"] == []:
+                url = f"https://www.labirint.ru/search/{book['book_name']}/?stype=0"
+                urls = get_urls(
+                    url, book["book_name_without_symbols"])
+                try:
+                    with Pool(8) as p:
+                        result = p.map(get_book_data, urls)
+                except KeyboardInterrupt:
+                    p.terminate()
+                    p.join()
+                    with open("response_custom.json", 'w', encoding='utf-8') as f:
+                        json.dump(book, f, indent=4, ensure_ascii=False)
+                book["labirint"] = result
+            count_books += 1
+            if count_books % 25 == 0:
+                print(f"[+] Обработано {count_books}")
+    except:
+        print("Исключение")
+        # with open(f"response_custom.json", 'w', encoding='utf-8') as f:
+        #     json.dump(books, f, indent=4, ensure_ascii=False)
+    for book in books:
+        if 'labirint' not in book.keys():
+            book["labirint"] = []
+    with open("response_custom.json", 'w', encoding='utf-8') as f:
+        json.dump(books, f, indent=4, ensure_ascii=False)

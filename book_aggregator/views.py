@@ -11,6 +11,38 @@ from utils import add_book, add_subcategories
 import json
 from book_aggregator.models import Book, SubCategory, Category, Comment, Rating, RatingStar
 from book_aggregator.forms import SearchForm, FilterForm, SortForm, CommentForm, RatingForm
+from django.utils.timezone import make_aware
+from slugify import slugify
+import datetime
+
+
+def add_books():
+    with open(f"response_custom.json", 'r', encoding='utf-8') as f:
+        books = json.load(f)
+    books_count = len(Book.objects.all())
+    for book in books:
+        updated_at = make_aware(datetime.datetime.now())
+        url = slugify(book["book_name"][:50] + f" {books_count + 1}")
+        slug = slugify(book["book_name"])
+        try:
+            Book.objects.get(slug=slug)
+        except ObjectDoesNotExist:
+            Book(name=book["book_name"],
+                 author=book["book_author"],
+                 categories=book["book_category"],
+                 image_url=book["book_image"],
+                 genres=book["book_genres"],
+                 description=book["book_title"],
+                 avg_rating=book['book_avg_rating'],
+                 min_price=book['min_price'],
+                 max_price=book['max_price'],
+                 have_electronic_version=book['have_electronic_version'],
+                 have_physical_version=book['have_physical_version'],
+                 sources=book["sources"],
+                 updated_at=updated_at,
+                 url=url,
+                 slug=slug).save()
+        books_count += 1
 
 
 def index(request):
@@ -502,7 +534,7 @@ def book_search(request):
 def book_detail(request, book_slug):
     book = get_object_or_404(
         Book,
-        slug=book_slug,
+        url=book_slug,
     )
     added_to_favourite = None
 
@@ -565,7 +597,7 @@ def book_detail(request, book_slug):
     book_genres = book.genres
     similar_books_list = []
     similar_books = Book.objects.filter(
-        genres__overlap=book_genres).exclude(slug=book_slug)
+        genres__overlap=book_genres).exclude(url=book_slug)
     for similar_book in similar_books:
         for genre in similar_book.genres:
             if genre in book_genres:
@@ -605,8 +637,7 @@ def book_comment(request, book_slug):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse('accounts:login'))
     have_comment = None
-
-    book = get_object_or_404(Book, slug=book_slug)
+    book = get_object_or_404(Book, url=book_slug)
     comment = None
     comment_book = request.POST.copy()
     form = CommentForm()
@@ -627,7 +658,9 @@ def book_comment(request, book_slug):
     form = CommentForm(comment_book)
     rating_form = RatingForm(comment_book)
     print(form.errors)
+    print('я тут')
     if form.is_valid() and rating_form.is_valid() and 'csrfmiddlewaretoken' in request.POST:
+
         if 'comment_add' in request.POST:
             Comment.objects.update_or_create(
                 name=comment_book['name'],
@@ -660,25 +693,11 @@ def book_comment(request, book_slug):
                 name=comment_book['name'],
                 book=book
             ).delete()
+
         return HttpResponseRedirect(reverse('book_aggregator:detail', args=[book_slug]))
     return render(request, 'book_aggregator/comment.html', context={
         'book': book,
         'form': form,
         'rating_form': rating_form,
         'have_comment': have_comment,
-    })
-
-
-def user_favourite_books(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('accounts:login'))
-
-    favourite_books = []
-    if request.user.is_authenticated:
-        favourite_books = request.user.favourite_books.filter()
-        commented_books = [comment.book for comment in Comment.objects.filter(
-            name=request.user.username)]
-        print(commented_books)
-    return render(request, 'book_aggregator/favourite_books.html', context={
-        'favourite_books': favourite_books,
     })

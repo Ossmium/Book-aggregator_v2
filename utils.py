@@ -1,6 +1,6 @@
 import os
 import json
-from book_aggregator.models import Book, SubCategory
+# from book_aggregator.models import Book, SubCategory
 from django.utils.timezone import make_aware
 from slugify import slugify
 import datetime
@@ -32,18 +32,15 @@ def remove_symbols(string):
 
 
 def modify_data():
-    for file in os.listdir("./response_custom_all_test"):
-        with open(f"./response_custom_all_test/{file}", 'r', encoding='utf-8') as f:
-            books_info_pages = json.load(f)
-    # with open('response_1.json', 'r', encoding='utf-8') as file:
-    #     books_info_pages = json.load(file)
-            for books_info_page in books_info_pages:
-                for book_info in books_info_page:
-                    book_info['book_name'] = book_info['book_name'].replace(' ', ' ')
-                    book_info['book_name_without_symbols'] = book_info['book_name'].translate(TRANSLATE_TABLE).replace('  ', ' ').lower()
-                    book_info['book_title'] = book_info['book_title'].replace(' ', ' ')
-        with open(f"./response_custom_all_test/{file}", 'w', encoding='utf-8') as f:
-            json.dump(books_info_pages, f, indent=4, ensure_ascii=False)
+    with open(f"response_custom.json", 'r', encoding='utf-8') as f:
+        books = json.load(f)
+        for book in books:
+            book['book_name'] = book['book_name'].replace(' ', ' ')
+            book['book_name_without_symbols'] = book['book_name'].translate(
+                TRANSLATE_TABLE).replace('  ', ' ').lower()
+            book['book_title'] = book['book_title'].replace(' ', ' ')
+    with open("response_custom.json", 'w', encoding='utf-8') as f:
+        json.dump(books, f, indent=4, ensure_ascii=False)
 
 
 def find_books():
@@ -60,7 +57,8 @@ def flat_book_lists():
             books_info_pages = json.load(f)
         for books_info_page in books_info_pages:
             for book_info in books_info_page:
-                book_info["book_title"] = book_info["book_title"].replace('\n', ' ')
+                book_info["book_title"] = book_info["book_title"].replace(
+                    '\n', ' ')
                 books_list.append(book_info)
     with open("final_file.json", "w", encoding="utf-8") as file:
         json.dump(books_list, file, indent=4, ensure_ascii=False)
@@ -82,43 +80,37 @@ def add_prices_litres():
 
 
 def make_sources():
-    for file in os.listdir("./response_test_sources_v2"):
-        with open(f"./response_test_sources_v2/{file}", 'r', encoding='utf-8') as f:
-            books_info_pages = json.load(f)
-        counter = 0
-        for books_info_page in books_info_pages:
-            for book_info in books_info_page:
-                counter += 1
-                print(counter)
-                book_info["sources"] = {
-                    "litres": [
-                        {
-                            "url": book_info["book_link"],
-                            "rating": book_info["book_rating"],
-                            "price": book_info["price"],
-                        }
-                    ],
-                    "mybook": [
-                        {
-                            "url": book_info["mybook_link"] if book_info["mybook_link"] else "",
-                            "rating": book_info["mybook_rating"] if book_info["mybook_rating"] else None,
-                            "price": book_info["mybook_price"] if book_info["mybook_price"] else None,
-                        }
-                    ],
-                    "labirint": book_info["labirint"],
-                    "chitai-gorod": book_info["chitai-gorod"]
+    with open(f"response_custom.json", 'r', encoding='utf-8') as f:
+        books = json.load(f)
+    for book in books:
+        book["sources"] = {
+            "litres": [
+                {
+                    "url": book["book_link"],
+                    "rating": book["book_rating"],
+                    "price": book["price"],
                 }
-                book_info.pop("book_rating")
-                book_info.pop("book_link")
-                book_info.pop("mybook_link")
-                book_info.pop("mybook_rating")
-                book_info.pop("mybook_price")
-                book_info.pop("labirint")
-                book_info.pop("chitai-gorod")
-                book_info.pop("price")
-        with open(f"./response_test_sources_v2/{file}", "w", encoding="utf-8") as f:
-            json.dump(books_info_pages, f, indent=4, ensure_ascii=False)
-        print(f"[+] {file}")
+            ],
+            "mybook": [
+                {
+                    "url": book["mybook_link"] if book["mybook_link"] else "",
+                    "rating": book["mybook_rating"] if book["mybook_rating"] else None,
+                    "price": book["mybook_price"] if book["mybook_price"] else None,
+                }
+            ],
+            "labirint": book["labirint"],
+            "chitai-gorod": book["chitai-gorod"]
+        }
+        book.pop("book_rating")
+        book.pop("book_link")
+        book.pop("mybook_link")
+        book.pop("mybook_rating")
+        book.pop("mybook_price")
+        book.pop("labirint")
+        book.pop("chitai-gorod")
+        book.pop("price")
+    with open(f"response_custom.json", "w", encoding="utf-8") as f:
+        json.dump(books, f, indent=4, ensure_ascii=False)
 
 
 def add_keys():
@@ -169,7 +161,7 @@ def make_union_list():
 
 
 def modify_books():
-    with open("final_file_v4.json", "r", encoding="utf-8") as file:
+    with open("response_custom.json", "r", encoding="utf-8") as file:
         books_list = json.load(file)
     for book in books_list:
         if type(book['book_category']) != list:
@@ -204,7 +196,7 @@ def modify_books():
         book['max_price'] = max(book_prices)
 
         # print(book_rating, book_sources_counter)
-    with open("final_file_v4.json", "w", encoding="utf-8") as file:
+    with open("response_custom.json", "w", encoding="utf-8") as file:
         json.dump(books_list, file, indent=4, ensure_ascii=False)
 
 
@@ -240,19 +232,3 @@ def add_subcategories():
             name=books_subcategory,
             slug=slugify(books_subcategory)
         ).save()
-
-if __name__ == "__main__":
-    # flat_book_lists()
-    # make_sources()
-    # add_keys()
-    # make_books_categories()
-    # make_union_list()
-
-    # with open("final_file_v3.json", 'r', encoding='utf-8') as file:
-    #     books = json.load(file)
-    # book = books[1]
-    # print(slugify(book["book_name"]))
-    # add_book(book)
-    # print(datetime.datetime.now())
-    # modify_books()
-    add_subcategories()

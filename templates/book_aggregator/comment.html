@@ -2,7 +2,7 @@
 {% block title %}{{ book.name }}{% endblock %}
 {% block content %}
 
-<form action="{% url 'book_aggregator:comment' book.slug %}" method="post" class="ms-5 me-5">
+<form action="{% url 'book_aggregator:comment' book.url %}" method="post" class="ms-5 me-5">
     {% csrf_token %}
     <div class="row">
         <div class="mt-2">

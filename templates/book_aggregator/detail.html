@@ -25,7 +25,7 @@
             </a>
             {% endif %}
         </form>
-        <a href="{% url "book_aggregator:comment" book.slug %}">
+        <a href="{% url "book_aggregator:comment" book.url %}">
             {% if user.is_authenticated %}
                 <button class="btn btn-outline-primary w-100 mt-2" value="have_comment">
                     {% if have_comment %}

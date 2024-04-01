@@ -45,7 +45,9 @@
                     </svg>
                   </div> 
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="{% url "book_aggregator:favourite_books" %}">Избранное</a></li>
+                    <li><a class="dropdown-item" href="{% url "accounts:books" %}">Ваши книги</a></li>
+                    <li><a class="dropdown-item" href="{% url "accounts:favourite_books" %}">Избранное</a></li>
+                    <li><a class="dropdown-item" href="{% url "accounts:commented_books" %}">Ваши отзывы</a></li>
                     <li><a class="dropdown-item" href="#">Профиль</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>

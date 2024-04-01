@@ -5,7 +5,6 @@ import random
 import zipfile
 import requests
 from bs4 import BeautifulSoup
-# from selenium import webdriver
 import undetected_chromedriver as uc
 from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
@@ -15,7 +14,6 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium_recaptcha_solver.exceptions import RecaptchaException
-# from seleniumwire import webdriver
 
 LITRES_URLS = {
     "Легкое чтение": "https://api.litres.ru/foundation/api/genres/201583/arts/facets?art_types=text_book&genre=201583&limit=1000&o=popular&offset=",
@@ -160,7 +158,8 @@ def change_proxy(counter, start_time):
         }
     }
     user_agent = UserAgent(min_percentage=10.0).random
-    print(f'\nКоличество обработанных книг: {BOOKS_COUNTER}', f"Прокси: {proxy_dict[CHANGE_PROXY_FLAG % len(proxy_dict)]['PROXY_HOST']}", f"User-Agent: {user_agent} {time.time() - start_time}\n")
+    print(f'\nКоличество обработанных книг: {BOOKS_COUNTER}',
+          f"Прокси: {proxy_dict[CHANGE_PROXY_FLAG % len(proxy_dict)]['PROXY_HOST']}", f"User-Agent: {user_agent} {time.time() - start_time}\n")
 
     manifest_json = """
     {
@@ -219,13 +218,12 @@ def change_proxy(counter, start_time):
 
 
 def get_chromedriver(use_proxy=False, user_agent=None,  manifest_json=None, background_js=None):
-    # chrome_options = webdriver.ChromeOptions()
     chrome_options = uc.ChromeOptions()
-    # chrome_service = Service(executable_path='chromedriver-win64/chromedriver.exe')
-    # chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_argument(
+        "--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option(
+        "excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
     chrome_options.add_argument("--window-size=1280,720")
 
@@ -246,14 +244,10 @@ def get_chromedriver(use_proxy=False, user_agent=None,  manifest_json=None, back
     if user_agent:
         chrome_options.add_argument(f'--user-agent={user_agent}')
 
-    # driver = webdriver.Chrome(seleniumwire_options=proxy_options, options=chrome_options, executable_path="chromedriver-win64/chromedriver.exe")
     driver = uc.Chrome(options=chrome_options,
                        executable_path="chromedriver-win64/chromedriver.exe")
-    # driver = webdriver.Chrome(
-    #     options=chrome_options,
-    #     service=chrome_service
-    # )
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    driver.execute_script(
+        "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
         'source': '''
             delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array;
@@ -312,17 +306,21 @@ def get_book_data(driver, book):
         solver = RecaptchaSolver(driver=driver)
         try:
             WebDriverWait(driver, 20).until(
-                ec.presence_of_element_located((By.XPATH, '//iframe[@title="reCAPTCHA"]'))
+                ec.presence_of_element_located(
+                    (By.XPATH, '//iframe[@title="reCAPTCHA"]'))
             )
-            recaptcha_iframe = driver.find_element(By.XPATH, '//iframe[@title="reCAPTCHA"]')
+            recaptcha_iframe = driver.find_element(
+                By.XPATH, '//iframe[@title="reCAPTCHA"]')
             solver.click_recaptcha_v2(iframe=recaptcha_iframe)
         except RecaptchaException:
             time.sleep(300)
             # driver.refresh()
             WebDriverWait(driver, 20).until(
-                ec.presence_of_element_located((By.XPATH, '//iframe[@title="reCAPTCHA"]'))
+                ec.presence_of_element_located(
+                    (By.XPATH, '//iframe[@title="reCAPTCHA"]'))
             )
-            recaptcha_iframe = driver.find_element(By.XPATH, '//iframe[@title="reCAPTCHA"]')
+            recaptcha_iframe = driver.find_element(
+                By.XPATH, '//iframe[@title="reCAPTCHA"]')
             solver.click_recaptcha_v2(iframe=recaptcha_iframe)
         if soup.find('input', class_='coolbtn'):
             WebDriverWait(driver, 20).until(
@@ -334,15 +332,13 @@ def get_book_data(driver, book):
             driver.find_element(By.CLASS_NAME, "coolbtn").click()
             time.sleep(5)
         element = WebDriverWait(driver, 20).until(
-            ec.presence_of_element_located((By.CLASS_NAME, "BookCard-module__genresList_1HXfh"))
+            ec.presence_of_element_located(
+                (By.CLASS_NAME, "BookCard-module__genresList_1HXfh"))
         )
         driver.refresh()
         time.sleep(100)
     source_data = driver.page_source
     soup = BeautifulSoup(source_data, "lxml")
-    # element = WebDriverWait(driver, 20).until(
-    #     EC.presence_of_element_located((By.CLASS_NAME, "BookCard-module__genresList_1HXfh"))
-    # )
 
     genres = soup.find('div', class_='BookCard-module__genresList_1HXfh')
     genres_list = []
@@ -353,23 +349,13 @@ def get_book_data(driver, book):
 
     book_title = ''
     if soup.find('div', class_='BookCard-module__book__annotation_2ZIhf'):
-        book_title = soup.find('div', class_='BookCard-module__book__annotation_2ZIhf').text
+        book_title = soup.find(
+            'div', class_='BookCard-module__book__annotation_2ZIhf').text
 
-    print(book['book_name'] if book['book_name'] else None, f"{book['book_link']}" if book['book_link'] else None, genres_list)
-
-    # book_info = {
-    #     'book_name': book['title'] if book['title'] else None,
-    #     'book_author': book['persons'][0]['full_name'] if book['persons'] else None,
-    #     'book_genres': genres_list,
-    #     'book_category': 'Бизнес',
-    #     'book_title': book_title,
-    #     'book_rating': book['rating']['rated_avg'] if book['rating'] else None,
-    #     'book_link': f"https://litres.ru{book['url']}" if book['url'] else None,
-    #     'book_image': f"https://litres.ru{book['cover_url']}" if book['cover_url'] else None
-    # }
+    print(book['book_name'] if book['book_name'] else None,
+          f"{book['book_link']}" if book['book_link'] else None, genres_list)
     book["book_genres"] = genres_list
     book["book_title"] = book_title
-    # return book
 
 
 def check_books_count(books_dict):
@@ -382,19 +368,14 @@ def check_books_count(books_dict):
 
 
 def main():
-    # get_data()
     global CHANGE_PROXY_FLAG
     global BOOKS_COUNTER
 
-    # if
     with open('response_litres_public_custom_all.json', 'r', encoding='utf-8') as file:
         books_dict = json.load(file)
 
-    # change_proxy_flag = 0
     books_list = []
-    # counter = 0
     start_time = time.time()
-    # while check_books_count(books_dict) != 0:
     try:
         for item in books_dict:
             books_info = []
@@ -405,60 +386,26 @@ def main():
                             if CHANGE_PROXY_FLAG > 0:
                                 driver.close()
                                 driver.quit()
-                            driver = change_proxy(CHANGE_PROXY_FLAG, start_time)
+                            driver = change_proxy(
+                                CHANGE_PROXY_FLAG, start_time)
                             CHANGE_PROXY_FLAG += 1
                         driver.get(f"{book['book_link']}")
-                        # source_data = driver.page_source
-                        # # print(driver.find_element(By.XPATH, '//iframe[@title="reCAPTCHA"]'))
-                        #
-                        # soup = BeautifulSoup(source_data, "lxml")
-                        # if soup.find('input', class_='coolbtn'):
-                        #     driver.close()
-                        #     driver.quit()
-                        #     print('--------------Капча тута--------------')
-                        #     print('До:', CHANGE_PROXY_FLAG)
-                        #     CHANGE_PROXY_FLAG += 1
-                        #     print('После:', CHANGE_PROXY_FLAG)
-                        #     time.sleep(300)
-                        #     driver = change_proxy(CHANGE_PROXY_FLAG, start_time)
-                        #     driver.get(f"https://litres.ru{book['url']}")
-                        #     time.sleep(5)
-
-                        # time.sleep(10000)
                         get_book_data(driver, book)
                     except TimeoutException:
                         try:
                             driver.refresh()
                             get_book_data(driver, book)
                         except TimeoutException:
-                            # book_info = {
-                            #     'book_name': book['title'] if book['title'] else None,
-                            #     'book_author': book['persons'][0]['full_name'] if book['persons'] else None,
-                            #     'book_genres': [],
-                            #     'book_category': 'Бизнес',
-                            #     'book_title': '',
-                            #     'book_rating': book['rating']['rated_avg'] if book['rating'] else None,
-                            #     'book_link': f"https://litres.ru{book['url']}" if book['url'] else None,
-                            #     'book_image': f"https://litres.ru{book['cover_url']}" if book['cover_url'] else None
-                            # }
                             book["book_genres"] = []
                             book["book_title"] = ""
-                            print('Exception:', book['book_name'] if book['book_name'] else None, book['book_link'], [], BOOKS_COUNTER)
-                    # books_info.append(book)
+                            print('Exception:', book['book_name'] if book['book_name'] else None, book['book_link'], [
+                            ], BOOKS_COUNTER)
                     time.sleep(random.uniform(2, 4))
                     BOOKS_COUNTER += 1
-            # books_list.append(books_info)
-        # driver.close()
-        # driver.quit()
     except:
-        # CHANGE_PROXY_FLAG += 1
-        # driver = change_proxy(CHANGE_PROXY_FLAG, start_time)
         print("Исключение")
         with open('response_litres_public_custom_all.json', 'w', encoding='utf-8') as file:
-            json.dump(books_dict, file, indent=4, ensure_ascii=False)
-            # time.sleep(10)
-            # continue
-            # raise
+            json.dump(books_dict, file, indent=4, ensure_ascii=False)\
 
     with open('response_litres_public_custom_all.json', 'w', encoding='utf-8') as file:
         json.dump(books_dict, file, indent=4, ensure_ascii=False)

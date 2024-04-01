@@ -9,6 +9,4 @@ urlpatterns = [
     path('books/<slug:book_slug>/comment/',
          views.book_comment, name='comment'),
     path('books/<slug:book_slug>/', views.book_detail, name='detail'),
-
-    path('profile/favourite/', views.user_favourite_books, name='favourite_books'),
 ]
