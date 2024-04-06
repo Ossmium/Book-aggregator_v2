@@ -232,3 +232,56 @@ def add_subcategories():
             name=books_subcategory,
             slug=slugify(books_subcategory)
         ).save()
+
+
+def add_books_v2():
+    with open(f"final_file_v5.json", 'r', encoding='utf-8') as f:
+        books = json.load(f)
+    for book in books:
+        for source in book['sources']:
+            if len(book['sources'][source]):
+                if book['sources'][source][-1]['url'] != '':
+                    books_sources = []
+                    for book_sources in book['sources'][source]:
+                        book_sources_list = []
+                        dt = datetime.datetime.now()
+                        dt_str = dt.strftime("%Y-%m-%d %H:%M:%S")
+                        book_sources_list.append([book_sources, dt_str])
+                        books_sources.append(book_sources_list)
+                    book['sources'][source] = books_sources
+            else:
+                book['sources'][source] = []
+    with open('final_file_v7.json', 'w', encoding='utf-8') as f:
+        json.dump(books, f, indent=4, ensure_ascii=False)
+
+
+def add_price_stats(books_list):
+    for book in books_list:
+        summary_counter = 0
+        summary_avg_price = 0
+        stats = {
+            'data': []
+        }
+        obj = {}
+        for source in book.sources:
+            if source == 'mybook':
+                continue
+            source_avg_sum = 0
+            counter = 0
+            for el in book.sources[source]:
+                if type(el[-1][0]['price']) != str and el[-1][0]['price'] != None:
+                    source_avg_sum += el[-1][0]['price']
+                    summary_avg_price += el[-1][0]['price']
+                    counter += 1
+                    summary_counter += 1
+            if not counter:
+                continue
+            obj[source] = source_avg_sum / counter
+        print(book.url, summary_avg_price)
+        obj['summary'] = summary_avg_price / summary_counter
+        dt = datetime.datetime.now()
+        dt_str = dt.strftime("%Y-%m-%d %H:%M:%S")
+        obj['updated_at'] = dt_str
+        stats['data'].append(obj)
+        book.price_stats = stats
+        book.save()

@@ -53,6 +53,49 @@ def index(request):
     if request.user.is_authenticated:
         print(request.user.favourite_books.filter())
 
+    # for book in books_list:
+    #     for source in book.sources:
+    #         if source == 'litres':
+    #             for el in book.sources[source]:
+    #                 for item in el:
+    #                     if item[0]['price'] == None:
+    #                         item[0]['price'] = 0.0
+    #     book.save()
+    # for book in books_list:
+    #     book_sources = []
+    #     for source in book.sources:
+    #         book_source_list = []
+    #         for book_source in book.sources[source]:
+    #             book_source_list.append(book_source)
+    #         book_sources.append(book_source_list)
+    #     print(book_sources)
+    # book.sources[source] = book_sources
+    # book.save()
+
+    # with open(f"final_file_v7.json", 'r', encoding='utf-8') as f:
+    #     books = json.load(f)
+    # books_count = len(Book.objects.all())
+    # for book in books:
+    #     updated_at = make_aware(datetime.datetime.now())
+    #     url = slugify(book["book_name"][:50] + f" {books_count + 1}")
+    #     slug = slugify(book["book_name"])
+    #     Book(name=book["book_name"],
+    #          author=book["book_author"],
+    #          categories=book["book_category"],
+    #          image_url=book["book_image"],
+    #          genres=book["book_genres"],
+    #          description=book["book_title"],
+    #          avg_rating=book['book_avg_rating'],
+    #          min_price=book['min_price'],
+    #          max_price=book['max_price'],
+    #          have_electronic_version=book['have_electronic_version'],
+    #          have_physical_version=book['have_physical_version'],
+    #          sources=book["sources"],
+    #          updated_at=updated_at,
+    #          url=url,
+    #          slug=slug).save()
+    #     books_count += 1
+
     return render(request, "book_aggregator/index.html", context={
         # 'form': form,
         # 'filter_form': filter_form,
@@ -558,7 +601,6 @@ def book_detail(request, book_slug):
     comments = Comment.objects.filter(book=book)
     have_comment = False
     user_comment = None
-    print(comments)
     if len(comments.filter(name=request.user.username)):
         have_comment = True
 
@@ -567,7 +609,6 @@ def book_detail(request, book_slug):
         for comment in comments:
             avg_rating += Rating.objects.get(comment=comment).star.value
         avg_rating /= len(comments)
-    print(avg_rating)
 
     comments_with_rating = []
     for comment in comments:
@@ -577,22 +618,38 @@ def book_detail(request, book_slug):
         comments_with_rating.append(
             (rating_for_comment, list(range(stars_active)), list(range(stars_disable)), comment))
 
-    print(have_comment)
-    book_sources_list = []
     book_sources = book.sources
+    book_sources_list = []
     for source in book_sources:
         source_name = ''
+        # print('Labirint', book_sources['labirint'][-1][0])
         if len(book_sources[source]) != 0:
-            if book_sources[source][0]['url'] != '':
-                if source == 'litres':
-                    source_name = 'Литрес'
-                elif source == 'mybook':
-                    source_name = 'Mybook'
-                elif source == 'labirint':
-                    source_name = 'Лабиринт'
-                elif source == 'chitai-gorod':
-                    source_name = 'Читай Город'
-                book_sources_list.append((source_name, book_sources[source]))
+            # for book__ in book_sources[source]:
+            # print(, book_sources[source][-1])
+            if source == 'mybook':
+                try:
+                    book_sources[source][-1]['url'] == ''
+                    continue
+                except TypeError:
+                    pass
+            # books = list(book_sources[source])
+            # print(books)
+            # print(source, books)
+            if source == 'litres':
+                source_name = 'Литрес'
+            elif source == 'mybook':
+                source_name = 'Mybook'
+            elif source == 'labirint':
+                source_name = 'Лабиринт'
+            elif source == 'chitai-gorod':
+                source_name = 'Читай Город'
+            source_list = []
+            # print(books)
+            for book_source in book_sources[source]:
+                # print(book_source[-1][0])
+                # print(book_source[-1])
+                source_list.append(book_source[-1][0])
+            book_sources_list.append((source_name, source_list))
 
     book_genres = book.genres
     similar_books_list = []
@@ -619,7 +676,6 @@ def book_detail(request, book_slug):
     for genre in book.genres:
         genres.append(SubCategory.objects.get(name=genre))
 
-    print(comments_with_rating)
     return render(request, 'book_aggregator/detail.html', context={
         # 'book_form': book_form,
         'book': book,

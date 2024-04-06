@@ -12,8 +12,8 @@ app.autodiscover_tasks()
 
 app.autodiscover_tasks()
 app.conf.beat_schedule = {
-    'send-report-every-single-minute': {
-        'task': 'publish.tasks.send_view_count_report',
-        'schedule': crontab(minute='*/1440', day_of_week='sunday'),
+    'send-report-every-sunday': {
+        'task': 'book_aggregator.tasks.get_new_books',
+        'schedule': crontab(hour=7, minute=30, day_of_week='sunday'),
     },
 }

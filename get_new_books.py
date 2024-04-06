@@ -235,8 +235,6 @@ def get_book_data(driver, book):
         book_title = soup.find(
             'div', class_='BookCard_book__annotation__8wq0r').text
 
-    print(book['book_name'] if book['book_name'] else None,
-          f"{book['book_link']}" if book['book_link'] else None, genres_list)
     book["book_genres"] = genres_list
     book["book_title"] = book_title
 
@@ -260,6 +258,8 @@ def get_books():
     books_list = []
     try:
         for book in books:
+            if BOOKS_COUNTER % 25 == 0:
+                print(f'[+] Обработано {BOOKS_COUNTER}')
             if "book_genres" not in book.keys() or book["book_genres"] == []:
                 try:
                     if BOOKS_COUNTER % BOOKS_NUMBER_TO_CHANGE == 0:
@@ -298,6 +298,5 @@ def get_books():
     modify_books()
 
 
-# if __name__ == '__main__':
-#     get_books()
-#     # get_data()
+if __name__ == '__main__':
+    get_books()

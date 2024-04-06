@@ -51,6 +51,7 @@ class Book(models.Model):
     updated_at = models.DateTimeField()
     url = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=1000)
+    price_stats = models.JSONField(default=dict())
     users = models.ManyToManyField(User, related_name='favourite_books')
 
     class Meta:
