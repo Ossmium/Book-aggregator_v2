@@ -159,3 +159,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 final_file_v4.json
+final_file_v5.json
+final_file_v6.json
+final_file_v7.json
+response_custom.json
+response_litres.json

@@ -235,7 +235,7 @@ def add_subcategories():
 
 
 def add_books_v2():
-    with open(f"final_file_v5.json", 'r', encoding='utf-8') as f:
+    with open(f"response_custom.json", 'r', encoding='utf-8') as f:
         books = json.load(f)
     for book in books:
         for source in book['sources']:
@@ -251,24 +251,26 @@ def add_books_v2():
                     book['sources'][source] = books_sources
             else:
                 book['sources'][source] = []
-    with open('final_file_v7.json', 'w', encoding='utf-8') as f:
+    with open('response_custom.json', 'w', encoding='utf-8') as f:
         json.dump(books, f, indent=4, ensure_ascii=False)
 
 
-def add_price_stats(books_list):
-    for book in books_list:
+def add_price_stats():
+    with open(f"response_custom.json", 'r', encoding='utf-8') as f:
+        books = json.load(f)
+    for book in books:
         summary_counter = 0
         summary_avg_price = 0
         stats = {
             'data': []
         }
         obj = {}
-        for source in book.sources:
+        for source in book['sources']:
             if source == 'mybook':
                 continue
             source_avg_sum = 0
             counter = 0
-            for el in book.sources[source]:
+            for el in book['sources'][source]:
                 if type(el[-1][0]['price']) != str and el[-1][0]['price'] != None:
                     source_avg_sum += el[-1][0]['price']
                     summary_avg_price += el[-1][0]['price']
@@ -277,11 +279,13 @@ def add_price_stats(books_list):
             if not counter:
                 continue
             obj[source] = source_avg_sum / counter
-        print(book.url, summary_avg_price)
+        # print(book.url, summary_avg_price)
         obj['summary'] = summary_avg_price / summary_counter
         dt = datetime.datetime.now()
         dt_str = dt.strftime("%Y-%m-%d %H:%M:%S")
         obj['updated_at'] = dt_str
         stats['data'].append(obj)
-        book.price_stats = stats
-        book.save()
+        book['price_stats'] = stats
+
+    with open('response_custom.json', 'w', encoding='utf-8') as f:
+        json.dump(books, f, indent=4, ensure_ascii=False)

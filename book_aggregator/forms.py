@@ -13,8 +13,15 @@ class CommentForm(forms.ModelForm):
                            widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': 'Name'}))
     email = forms.EmailField(required=True,
                              widget=forms.EmailInput(attrs={"class": "form-control", 'placeholder': 'Email'}))
-    body = forms.CharField(required=True, widget=forms.Textarea(
-        attrs={"class": "form-control", 'placeholder': 'Что вы думаете об этой книге?'}))
+    body = forms.CharField(required=True,
+                           widget=forms.Textarea(
+                               attrs={
+                                   "class": "form-control",
+                                   'placeholder': 'Комментарий',
+                                   'id': 'floatingComment',
+                                   'style': 'min-height: 300px'
+                               }
+                           ))
 
     class Meta:
         model = Comment

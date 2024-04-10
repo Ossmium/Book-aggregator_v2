@@ -7,8 +7,9 @@ from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.exceptions import ObjectDoesNotExist
 
-from utils import add_book, add_subcategories
+from book_aggregator.services.utils import add_book, add_subcategories
 import json
+from accounts.models import Profile
 from book_aggregator.models import Book, SubCategory, Category, Comment, Rating, RatingStar
 from book_aggregator.forms import SearchForm, FilterForm, SortForm, CommentForm, RatingForm
 from django.utils.timezone import make_aware
@@ -41,7 +42,8 @@ def add_books():
                  sources=book["sources"],
                  updated_at=updated_at,
                  url=url,
-                 slug=slug).save()
+                 slug=slug,
+                 price_stats=book['price_stats']).save()
         books_count += 1
 
 
@@ -49,9 +51,6 @@ def index(request):
     params = []
     books_list = Book.objects.all()
     books_subcategories = SubCategory.objects.all()
-
-    if request.user.is_authenticated:
-        print(request.user.favourite_books.filter())
 
     # for book in books_list:
     #     for source in book.sources:
@@ -612,11 +611,13 @@ def book_detail(request, book_slug):
 
     comments_with_rating = []
     for comment in comments:
+        avatar = Profile.objects.get(
+            user=User.objects.get(username=comment.name)).avatar
         rating_for_comment = Rating.objects.get(comment=comment)
         stars_active = rating_for_comment.star.value
         stars_disable = 5 - stars_active
         comments_with_rating.append(
-            (rating_for_comment, list(range(stars_active)), list(range(stars_disable)), comment))
+            (rating_for_comment, list(range(stars_active)), list(range(stars_disable)), comment, avatar))
 
     book_sources = book.sources
     book_sources_list = []

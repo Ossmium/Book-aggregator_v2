@@ -110,7 +110,8 @@
                             <div class="card text-dark bg-light mb-3">
                                 <div class="card-body">
                                     <div class="card-title d-flex flex-direction-row justify-content-between mb-1 p-0">
-                                        <div class="d-flex flex-direction-row">
+                                        <div class="d-flex flex-direction-row align-items-center">
+                                            <img class="mb-3 me-2 rounded" src="{{ comment.4.url }} " style="cursor: pointer; max-height: 2rem; max-width: 2rem"/>
                                             <p class="me-2">{{ comment.3.name }}</p>
                                             <p>{{ comment.3.created }}</p>
                                         </div>
@@ -153,7 +154,7 @@
     <div class="col-sm-3">
         {% for source in sources %}
             <div class="dropdown mb-2">
-                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #ebebf2;">
                     {{ source.0 }}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
@@ -178,7 +179,7 @@
 </div>
 <div class="mt-4">
     <h4 class="mb-3">Похожие</h4>
-    <ul class="d-flex flex-direction-row flex-wrap p-0">
+    <ul class="ms-4 d-flex flex-direction-row flex-wrap p-0">
         {% for book in similar_books %}
             <li style="list-style-type: none; margin-right: 1em;">
                 <a href="{{ book.get_absolute_url }}" class="card" style="width: 10rem; text-decoration: none; color: black;  overflow: hidden; height: 260px;">

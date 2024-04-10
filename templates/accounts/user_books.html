@@ -4,7 +4,9 @@
 {% block content %}
 <div class="d-flex flex-direction-row align-items-center">
     <h4 class="me-3">Избранное</h4>
-    <a href="{% url "accounts:favourite_books" %}" class="mb-1" style="text-decoration: none;">Посмотреть все</a>
+    {% if favourite_books|length %}
+        <a href="{% url "accounts:favourite_books" %}" class="mb-1" style="text-decoration: none;">Посмотреть все</a>
+    {% endif %}
 </div>
 <ul class="ms-2 d-flex flex-direction-row flex-wrap p-0 mt-3">
     {% for book in favourite_books %}
@@ -24,7 +26,9 @@
 </ul>
 <div class="d-flex flex-direction-row align-items-center">
     <h4 class="me-3">Ваши отзывы</h4>
-    <a href="{% url "accounts:favourite_books" %}" class="mb-1" style="text-decoration: none;">Посмотреть все</a>
+    {% if commented_books|length %}
+        <a href="{% url "accounts:favourite_books" %}" class="mb-1" style="text-decoration: none;">Посмотреть все</a>
+    {% endif %}
 </div>
 <ul class="ms-2 d-flex flex-direction-row flex-wrap p-0 mt-3">
     {% for book in commented_books %}

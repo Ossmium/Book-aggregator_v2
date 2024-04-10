@@ -1,0 +1,12 @@
+<ul class="ms-5 d-flex flex-direction-row flex-wrap p-0">
+    {% for book in highest_rating_books %}
+        <li style="list-style-type: none; margin-right: 1em;">
+            <a href="{{ book.get_absolute_url }}" class="card" style="width: 10rem; text-decoration: none; color: black;  overflow: hidden; height: 260px;">
+                <img src="{{ book.image_url }}" class="card-img-top" style="max-height: 200px;">
+                <div class="card-body p-1">
+                    <p class="card-title mt-1" style="line-height: 16px; font-size: 14px; font-weight: 600;">{{ book.name|truncatechars:25 }}</p>
+                </div>
+            </a>
+        </li>
+    {% endfor %}
+</ul>

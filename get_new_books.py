@@ -18,7 +18,7 @@ from selenium_recaptcha_solver.exceptions import RecaptchaException
 from labirint_parser import parser_labirint
 from mybook_parser import parser_mybook
 from chitai_gorod_parser import parser_chitai_gorod
-from utils import modify_data, make_sources, modify_books
+from book_aggregator.services.utils import modify_data, make_sources, modify_books, add_books_v2, add_price_stats
 
 
 BOOKS_NUMBER_TO_CHANGE = 40
@@ -256,8 +256,9 @@ def get_books():
 
     start_time = time.time()
     books_list = []
+    print('Litres')
     try:
-        for book in books:
+        for book in books[:5]:
             if BOOKS_COUNTER % 25 == 0:
                 print(f'[+] Обработано {BOOKS_COUNTER}')
             if "book_genres" not in book.keys() or book["book_genres"] == []:
@@ -291,11 +292,17 @@ def get_books():
     with open('response_custom.json', 'w', encoding='utf-8') as file:
         json.dump(books_list, file, indent=4, ensure_ascii=False)
     modify_data()
+    print('Labirint')
     parser_labirint()
+    print('MyBook')
     parser_mybook()
+    print('Читай Город')
     parser_chitai_gorod()
+    print('Остальное')
     make_sources()
     modify_books()
+    add_books_v2()
+    add_price_stats()
 
 
 if __name__ == '__main__':

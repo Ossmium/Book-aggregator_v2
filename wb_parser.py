@@ -7,7 +7,7 @@ from requests.adapters import HTTPAdapter
 import requests
 from bs4 import BeautifulSoup
 from multiprocessing import Pool
-from utils import remove_symbols
+from book_aggregator.services.utils import remove_symbols
 from fake_useragent import UserAgent
 
 url = "https://search.wb.ru/exactmatch/ru/common/v4/search?ab_testid=reranking_5&appType=1&curr=rub&dest=-1257786&page=1&query=мастер и маргарита&resultset=catalog&sort=popular&spp=30&suppressSpellcheck=false&xsubject=381"

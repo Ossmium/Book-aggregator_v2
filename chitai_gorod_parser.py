@@ -7,7 +7,7 @@ from requests.adapters import HTTPAdapter
 import requests
 from bs4 import BeautifulSoup
 from multiprocessing import Pool
-from utils import remove_symbols
+from book_aggregator.services.utils import remove_symbols
 from fake_useragent import UserAgent
 
 

@@ -4,7 +4,7 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
-from utils import remove_symbols
+from book_aggregator.services.utils import remove_symbols
 
 PROXIES = {
     "https": "http://9VCVu0:CoVSb7@185.148.27.146:8000"

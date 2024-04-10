@@ -2,8 +2,10 @@ import os
 import json
 import requests
 from bs4 import BeautifulSoup
-from multiprocessing import Pool
-from utils import remove_symbols
+# from multiprocessing import Pool
+from book_aggregator.services.utils import remove_symbols
+# from billiard import pool
+from billiard.pool import Pool
 
 
 PROXIES = {
@@ -49,7 +51,6 @@ def get_book_data(url):
 
 
 def parser_labirint():
-    count_pages = 0
     count_books = 0
     with open(f"response_custom.json", 'r', encoding='utf-8') as f:
         books = json.load(f)
@@ -71,10 +72,8 @@ def parser_labirint():
             count_books += 1
             if count_books % 25 == 0:
                 print(f"[+] Обработано {count_books}")
-    except:
-        print("Исключение")
-        # with open(f"response_custom.json", 'w', encoding='utf-8') as f:
-        #     json.dump(books, f, indent=4, ensure_ascii=False)
+    except Exception as ex:
+        print(ex)
     for book in books:
         if 'labirint' not in book.keys():
             book["labirint"] = []

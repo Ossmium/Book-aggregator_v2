@@ -15,11 +15,23 @@
     {% endif %}
     <form method="post">
         {% csrf_token %}
-        {{ form.username }}
-        {{ form.email }}
-        {{ form.password1 }}
+        <div class="form-floating mb-3">
+            {{ form.username }}
+            <label for="floatingUsername">Логин</label>
+        </div>
+        <div class="form-floating mb-3">
+            {{ form.email }}
+            <label for="floatingEmail">Email</label>
+        </div>
+        <div class="form-floating mb-3">
+            {{ form.password1 }}
+            <label for="floatingPassword1">Пароль</label>
+        </div>
+        <div class="form-floating mb-3">
+            {{ form.password2 }}
+            <label for="floatingPassword2">Подтвердите пароль</label>
+        </div>
         {{ form.errors.password }}
-        {{ form.password2 }}
         <button type="submit" class="btn btn-primary btn-std w-100 mt-2 mb-2">Зарегистрироваться</button>
     </form>
     <a href="{% url "login" %}" class="btn btn-outline-primary btn-sm w-100">Есть аккаунт? Войти</a>

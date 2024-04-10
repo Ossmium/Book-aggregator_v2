@@ -4,8 +4,14 @@
 <div class="d-flex flex-column justify-content-center ms-auto me-auto login_window rounded-3" style="max-width: 20rem; margin-top: 7rem;">
     <h2>Вход</h2>
     <form method="post" class="form">
-        {{ form.username }}
-        {{ form.password }}
+        <div class="form-floating mb-3">
+            {{ form.username }}
+            <label for="floatingUsername">Логин</label>
+        </div>
+        <div class="form-floating mb-3">
+            {{ form.password }}
+            <label for="floatingPassword">Пароль</label>
+        </div>
         <div class="mb-1 mt-2">Запомнить меня: {{ form.remember_me }}</div>
         {% csrf_token %}
         <input type="submit" class="btn btn-primary btn-std w-100 mb-2" value="Войти">
