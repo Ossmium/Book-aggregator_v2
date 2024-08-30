@@ -29,26 +29,7 @@ LINK = f'https://api.litres.ru/foundation/api/arts/facets?art_types=text_book&is
 
 
 def change_proxy(counter, start_time):
-    proxy_dict = [
-        {
-            'PROXY_HOST': '185.148.27.146',
-            'PROXY_PORT': 8000,
-            'PROXY_USER': '9VCVu0',
-            'PROXY_PASS': 'CoVSb7',
-        },
-        {
-            'PROXY_HOST': '185.148.25.35',
-            'PROXY_PORT': 8000,
-            'PROXY_USER': '9VCVu0',
-            'PROXY_PASS': 'CoVSb7',
-        },
-        {
-            'PROXY_HOST': '185.148.25.167',
-            'PROXY_PORT': 8000,
-            'PROXY_USER': '9VCVu0',
-            'PROXY_PASS': 'CoVSb7',
-        },
-    ]
+    proxy_dict = []
     user_agent = UserAgent(min_percentage=5.0).random
     print(f'\nКоличество обработанных книг: {BOOKS_COUNTER}',
           f"Прокси: {proxy_dict[CHANGE_PROXY_FLAG % len(proxy_dict)]['PROXY_HOST']}", f"User-Agent: {user_agent} {time.time() - start_time}\n")
