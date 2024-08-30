@@ -83,11 +83,11 @@ WSGI_APPLICATION = 'BookAggregator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'book_aggregator',
-        'USER': 'book_aggregator',
-        'PASSWORD': 'MCXIEBp100',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
