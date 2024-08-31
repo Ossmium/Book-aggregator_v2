@@ -52,53 +52,7 @@ def index(request):
     books_list = Book.objects.all()
     books_subcategories = SubCategory.objects.all()
 
-    # for book in books_list:
-    #     for source in book.sources:
-    #         if source == 'litres':
-    #             for el in book.sources[source]:
-    #                 for item in el:
-    #                     if item[0]['price'] == None:
-    #                         item[0]['price'] = 0.0
-    #     book.save()
-    # for book in books_list:
-    #     book_sources = []
-    #     for source in book.sources:
-    #         book_source_list = []
-    #         for book_source in book.sources[source]:
-    #             book_source_list.append(book_source)
-    #         book_sources.append(book_source_list)
-    #     print(book_sources)
-    # book.sources[source] = book_sources
-    # book.save()
-
-    # with open(f"final_file_v7.json", 'r', encoding='utf-8') as f:
-    #     books = json.load(f)
-    # books_count = len(Book.objects.all())
-    # for book in books:
-    #     updated_at = make_aware(datetime.datetime.now())
-    #     url = slugify(book["book_name"][:50] + f" {books_count + 1}")
-    #     slug = slugify(book["book_name"])
-    #     Book(name=book["book_name"],
-    #          author=book["book_author"],
-    #          categories=book["book_category"],
-    #          image_url=book["book_image"],
-    #          genres=book["book_genres"],
-    #          description=book["book_title"],
-    #          avg_rating=book['book_avg_rating'],
-    #          min_price=book['min_price'],
-    #          max_price=book['max_price'],
-    #          have_electronic_version=book['have_electronic_version'],
-    #          have_physical_version=book['have_physical_version'],
-    #          sources=book["sources"],
-    #          updated_at=updated_at,
-    #          url=url,
-    #          slug=slug).save()
-    #     books_count += 1
-
     return render(request, "book_aggregator/index.html", context={
-        # 'form': form,
-        # 'filter_form': filter_form,
-        # 'query': query,
         'books': books_list,
         'subcategories': books_subcategories,
     })
@@ -134,23 +88,18 @@ def category(request, category_slug):
                     print(genre)
                     break
             genre_choices_list = [(genre, genre)for genre in genre_set]
-            # authors_arr = [(1, 1) for a]
             authors_choices_list = [[author, author]
                                     for author in authors_set]
             for author in authors_choices_list:
                 if author[0] is None:
                     author[0], author[1] = 'Нет автора', 'Нет автора'
-            # filter_form = FilterForm(
-            #     request.GET, authors_choices=authors_choices_set)
+                    
             authors_choices_list = sorted(
                 authors_choices_list, key=lambda x: x[1])
             genre_choices_list = sorted(
                 genre_choices_list, key=lambda x: x[1])
             filter_form.fields['authors'].choices = authors_choices_list
             filter_form.fields['genre'].choices = genre_choices_list
-
-            # print(len(authors_choices_set), authors_choices_set)
-            # print(results)
 
     if 'authors' in request.GET:
         if len(Category.objects.filter(slug=category_slug)):
@@ -160,10 +109,7 @@ def category(request, category_slug):
             category = SubCategory.objects.get(slug=category_slug)
             results = Book.objects.filter(genres__contains=[category])
 
-        # form = SearchForm(request.GET)
         filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         authors_set = set(
             [book.author for book in results])
         genre_set = set(
@@ -174,7 +120,7 @@ def category(request, category_slug):
                 genre_set.remove(genre)
                 print(genre)
                 break
-        # authors_arr = [(1, 1) for a]
+
         authors_choices_list = [[author, author]
                                 for author in authors_set]
         genre_choices_list = [(genre, genre)for genre in genre_set]
@@ -188,21 +134,14 @@ def category(request, category_slug):
 
         filter_form.fields['authors'].choices = authors_choices_list
         filter_form.fields['genre'].choices = genre_choices_list
-        # filter_form = FilterForm(
-        #     request.GET, authors_choices=authors_choices_set)
-        # print(filter_form.fields['authors'].choices)
         if filter_form.is_valid() and sort_form.is_valid():
             authors = filter_form.cleaned_data['authors']
-            # print(authors)
             if results != []:
                 results = results.filter(author__in=authors)
             else:
                 results = Book.objects.filter(author__in=authors)
             for author in authors:
                 params.append(('authors', author))
-            # results = Book.objects.annotate(
-            #     similarity=TrigramSimilarity('name', query),
-            # ).filter(similarity__gt=0.1).order_by('-similarity')
 
     if 'genre' in request.GET:
         if len(Category.objects.filter(slug=category_slug)):
@@ -224,7 +163,6 @@ def category(request, category_slug):
                 genre_set.remove(genre)
                 print(genre)
                 break
-        # authors_arr = [(1, 1) for a]
         authors_choices_list = [[author, author]
                                 for author in authors_set]
         genre_choices_list = [(genre, genre)for genre in genre_set]
@@ -248,37 +186,7 @@ def category(request, category_slug):
             for genre in genres:
                 params.append(('genre', genre))
 
-    # if 'price_from' in request.GET:
-    #     form = SearchForm(request.GET)
-    #     filter_form = FilterForm(request.GET)
-    #     sort_form = SortForm(request.GET)
-    #     # search_form = SearchForm()
-    #     if form.is_valid() and filter_form.is_valid() and sort_form.is_valid():
-    #         query = form.cleaned_data['query']
-    #         price_from = filter_form.cleaned_data['price_from']
-    #         if results != []:
-    #             results = results.filter(min_price__gt=price_from)
-    #         else:
-    #             results = Book.objects.filter(min_price__gt=price_from)
-
-    # if 'price_to' in request.GET:
-    #     form = SearchForm(request.GET)
-    #     filter_form = FilterForm(request.GET)
-    #     sort_form = SortForm(request.GET)
-    #     # search_form = SearchForm()
-    #     if form.is_valid() and filter_form.is_valid() and sort_form.is_valid():
-    #         query = form.cleaned_data['query']
-    #         price_to = filter_form.cleaned_data['price_to']
-    #         if results != []:
-    #             results = results.filter(min_price__lt=price_to)
-    #         else:
-    #             results = Book.objects.filter(min_price__lt=price_to)
-
     if 'more_than_four' in request.GET:
-        # form = SearchForm(request.GET)
-        # filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         if filter_form.is_valid() and sort_form.is_valid():
             more_than_four = filter_form.cleaned_data['more_than_four']
             if results != []:
@@ -290,10 +198,6 @@ def category(request, category_slug):
             params.append(('more_than_four', more_than_four))
 
     if 'have_electronic' in request.GET:
-        # form = SearchForm(request.GET)
-        # filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         if filter_form.is_valid() and sort_form.is_valid():
             have_electronic = filter_form.cleaned_data['have_electronic']
             if results != []:
@@ -305,10 +209,6 @@ def category(request, category_slug):
             params.append(('have_electronic', have_electronic))
 
     if 'have_physical' in request.GET:
-        # form = SearchForm(request.GET)
-        # filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         if filter_form.is_valid() and sort_form.is_valid():
             have_physical = filter_form.cleaned_data['have_physical']
             if results != []:
@@ -320,10 +220,6 @@ def category(request, category_slug):
             params.append(('have_physical', have_physical))
 
     if 'sort' in request.GET:
-        # form = SearchForm(request.GET)
-        # filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         if filter_form.is_valid() and sort_form.is_valid():
             sort = sort_form.cleaned_data['sort']
             if results != []:
@@ -337,15 +233,7 @@ def category(request, category_slug):
                 if have_physical:
                     results = Book.objects.filter(have_physical_version=True)
             params.append(('sort', sort))
-    # paginator = Paginator(results, 1)
-    # page_number = request.GET.get('page', 1)
-    # try:
-    #     results = paginator.page(page_number)
-    # except PageNotAnInteger:
-    #     results = paginator.page(1)
-    # except EmptyPage:
-    #     results = paginator.page(paginator.num_pages)
-    # print('Тут:', params)
+
     html = render(request, 'book_aggregator/categories_search.html', context={
         'params': params,
         'category': category,
@@ -379,35 +267,26 @@ def book_search(request):
             genre_set = set(
                 [genre for book in results for genre in book.genres])
             genre_choices_list = [(genre, genre)for genre in genre_set]
-            # authors_arr = [(1, 1) for a]
             authors_choices_list = [(author, author)
                                     for author in authors_set]
-            # filter_form = FilterForm(
-            #     request.GET, authors_choices=authors_choices_set)
             authors_choices_list = sorted(
                 authors_choices_list, key=lambda x: x[1])
             genre_choices_list = sorted(
                 genre_choices_list, key=lambda x: x[1])
             filter_form.fields['authors'].choices = authors_choices_list
             filter_form.fields['genre'].choices = genre_choices_list
-            # print(len(authors_choices_set), authors_choices_set)
-            # print(results)
 
     if 'authors' in request.GET:
         query = form.cleaned_data['query']
         results = Book.objects.annotate(
             similarity=TrigramSimilarity('name', query),
         ).filter(similarity__gt=0.2).order_by('-similarity')
-        print(results)
-        # form = SearchForm(request.GET)
         filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         authors_set = set(
             [book.author for book in results])
         genre_set = set(
             [genre for book in results for genre in book.genres])
-        # authors_arr = [(1, 1) for a]
+
         authors_choices_list = [(author, author)
                                 for author in authors_set]
         genre_choices_list = [(genre, genre)for genre in genre_set]
@@ -417,9 +296,6 @@ def book_search(request):
 
         filter_form.fields['authors'].choices = authors_choices_list
         filter_form.fields['genre'].choices = genre_choices_list
-        # filter_form = FilterForm(
-        #     request.GET, authors_choices=authors_choices_set)
-        # print(filter_form.fields['authors'].choices)
         if form.is_valid() and filter_form.is_valid() and sort_form.is_valid():
             query = form.cleaned_data['query']
             authors = filter_form.cleaned_data['authors']
@@ -428,9 +304,6 @@ def book_search(request):
                 results = results.filter(author__in=authors)
             else:
                 results = Book.objects.filter(author__in=authors)
-            # results = Book.objects.annotate(
-            #     similarity=TrigramSimilarity('name', query),
-            # ).filter(similarity__gt=0.1).order_by('-similarity')
 
     if 'genre' in request.GET:
         query = form.cleaned_data['query']
@@ -444,7 +317,6 @@ def book_search(request):
             [book.author for book in results])
         genre_set = set(
             [genre for book in results for genre in book.genres])
-        # authors_arr = [(1, 1) for a]
         authors_choices_list = [(author, author)
                                 for author in authors_set]
         genre_choices_list = [(genre, genre)for genre in genre_set]
@@ -464,37 +336,7 @@ def book_search(request):
             else:
                 results = Book.objects.filter(genres__contains=genres)
 
-    # if 'price_from' in request.GET:
-    #     form = SearchForm(request.GET)
-    #     filter_form = FilterForm(request.GET)
-    #     sort_form = SortForm(request.GET)
-    #     # search_form = SearchForm()
-    #     if form.is_valid() and filter_form.is_valid() and sort_form.is_valid():
-    #         query = form.cleaned_data['query']
-    #         price_from = filter_form.cleaned_data['price_from']
-    #         if results != []:
-    #             results = results.filter(min_price__gt=price_from)
-    #         else:
-    #             results = Book.objects.filter(min_price__gt=price_from)
-
-    # if 'price_to' in request.GET:
-    #     form = SearchForm(request.GET)
-    #     filter_form = FilterForm(request.GET)
-    #     sort_form = SortForm(request.GET)
-    #     # search_form = SearchForm()
-    #     if form.is_valid() and filter_form.is_valid() and sort_form.is_valid():
-    #         query = form.cleaned_data['query']
-    #         price_to = filter_form.cleaned_data['price_to']
-    #         if results != []:
-    #             results = results.filter(min_price__lt=price_to)
-    #         else:
-    #             results = Book.objects.filter(min_price__lt=price_to)
-
     if 'more_than_four' in request.GET:
-        # form = SearchForm(request.GET)
-        # filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         if form.is_valid() and filter_form.is_valid() and sort_form.is_valid():
             query = form.cleaned_data['query']
             more_than_four = filter_form.cleaned_data['more_than_four']
@@ -506,10 +348,6 @@ def book_search(request):
                     results = Book.objects.filter(avg_rating__gt=4)
 
     if 'have_electronic' in request.GET:
-        # form = SearchForm(request.GET)
-        # filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         if form.is_valid() and filter_form.is_valid() and sort_form.is_valid():
             query = form.cleaned_data['query']
             have_electronic = filter_form.cleaned_data['have_electronic']
@@ -521,10 +359,6 @@ def book_search(request):
                     results = Book.objects.filter(have_electronic_version=True)
 
     if 'have_physical' in request.GET:
-        # form = SearchForm(request.GET)
-        # filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         if form.is_valid() and filter_form.is_valid() and sort_form.is_valid():
             query = form.cleaned_data['query']
             have_physical = filter_form.cleaned_data['have_physical']
@@ -536,10 +370,6 @@ def book_search(request):
                     results = Book.objects.filter(have_physical_version=True)
 
     if 'sort' in request.GET:
-        # form = SearchForm(request.GET)
-        # filter_form = FilterForm(request.GET)
-        # sort_form = SortForm(request.GET)
-        # search_form = SearchForm()
         if form.is_valid() and filter_form.is_valid() and sort_form.is_valid():
             query = form.cleaned_data['query']
             sort = sort_form.cleaned_data['sort']
@@ -561,7 +391,6 @@ def book_search(request):
         'filter_form': filter_form,
         'sort_form': sort_form,
         'query': query,
-        # 'authors': authors,
         'books': results
     })
     if 'query' in request.GET:
@@ -623,19 +452,13 @@ def book_detail(request, book_slug):
     book_sources_list = []
     for source in book_sources:
         source_name = ''
-        # print('Labirint', book_sources['labirint'][-1][0])
         if len(book_sources[source]) != 0:
-            # for book__ in book_sources[source]:
-            # print(, book_sources[source][-1])
             if source == 'mybook':
                 try:
                     book_sources[source][-1]['url'] == ''
                     continue
                 except TypeError:
                     pass
-            # books = list(book_sources[source])
-            # print(books)
-            # print(source, books)
             if source == 'litres':
                 source_name = 'Литрес'
             elif source == 'mybook':
@@ -645,10 +468,7 @@ def book_detail(request, book_slug):
             elif source == 'chitai-gorod':
                 source_name = 'Читай Город'
             source_list = []
-            # print(books)
             for book_source in book_sources[source]:
-                # print(book_source[-1][0])
-                # print(book_source[-1])
                 source_list.append(book_source[-1][0])
             book_sources_list.append((source_name, source_list))
 
@@ -678,7 +498,6 @@ def book_detail(request, book_slug):
         genres.append(SubCategory.objects.get(name=genre))
 
     return render(request, 'book_aggregator/detail.html', context={
-        # 'book_form': book_form,
         'book': book,
         'genres': genres,
         'sources': book_sources_list,
@@ -711,11 +530,8 @@ def book_comment(request, book_slug):
             comment_book['body'] = user_comment.body
             have_comment = True
 
-    print(comment_book)
     form = CommentForm(comment_book)
     rating_form = RatingForm(comment_book)
-    print(form.errors)
-    print('я тут')
     if form.is_valid() and rating_form.is_valid() and 'csrfmiddlewaretoken' in request.POST:
 
         if 'comment_add' in request.POST:
@@ -743,8 +559,6 @@ def book_comment(request, book_slug):
                 user=request.user,
                 comment=comment,
             )
-            print(comment)
-            print(request.POST)
         elif 'comment_delete' in request.POST:
             Comment.objects.get(
                 name=comment_book['name'],
